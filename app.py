@@ -118,12 +118,6 @@ def predict():
             logging.warning("No stock symbol provided")
             return jsonify({'error': 'Please provide a valid stock symbol.'}), 400
 
-        # Check if the symbol is in the Indian stocks dictionary
-        if symbol in INDIAN_STOCKS:
-            symbol = INDIAN_STOCKS[symbol]  # Use the mapped symbol
-        
-        logging.info(f"Stock symbol received: {symbol}")
-        
         # Fetch stock data and make the prediction
         stock_data = get_stock_data(symbol)
         recommendation, future_price, current_price = train_model(stock_data, model_type=model_type)
@@ -135,10 +129,16 @@ def predict():
         else:
             currency = '$'  # US Dollar for other stocks
 
-        return jsonify({
+        response = jsonify({
             'prediction': f"The recommendation for {symbol} is to '{recommendation}'.",
             'details': f"Predicted future price: {currency}{future_price:.2f}, Current price: {currency}{current_price:.2f}"
         })
+        response.headers.add('Access-Control-Allow-Origin', '*')  # Add CORS headers manually
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+
+        return response
+
     except Exception as e:
         logging.error(f"Error during prediction: {e}")
         return jsonify({'error': str(e)}), 500
