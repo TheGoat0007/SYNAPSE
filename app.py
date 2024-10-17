@@ -13,7 +13,7 @@ import os
 
 # Initialize the Flask app
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/predict": {"origins": "*"}})
 
 # Set up basic logging
 logging.basicConfig(level=logging.INFO)
